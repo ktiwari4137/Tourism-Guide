@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from .models import Hotel
 from destinations.models import Destination
+from packages.models import TourPackage
 
 # Create your views here.
 
@@ -42,5 +43,5 @@ class HotelDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['packages'] = self.object.packages.all()
+        context['tour_packages'] = TourPackage.objects.filter(hotel=self.object)
         return context

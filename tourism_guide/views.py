@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from destinations.models import Destination
-from packages.models import Package
+from packages.models import TourPackage
 from feedback.models import Feedback
 
 def home(request):
@@ -8,7 +8,7 @@ def home(request):
     featured_destinations = Destination.objects.order_by('-rating')[:3]
     
     # Get available packages ordered by price (ascending)
-    popular_packages = Package.objects.filter(is_available=True).order_by('price')[:3]
+    popular_packages = TourPackage.objects.filter(is_available=True).order_by('price')[:3]
     
     # Get recent testimonials with user data
     testimonials = Feedback.objects.select_related('user').order_by('-created_at')[:3]

@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from packages.models import Package
+from packages.models import TourPackage
 from hotels.models import Hotel
 
 class Feedback(models.Model):
@@ -14,7 +14,7 @@ class Feedback(models.Model):
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='feedbacks')
-    package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='feedbacks', null=True, blank=True)
+    package = models.ForeignKey(TourPackage, on_delete=models.CASCADE, related_name='feedbacks', null=True, blank=True)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='feedbacks', null=True, blank=True)
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField()

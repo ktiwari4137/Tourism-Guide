@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tour Packages - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Tour Packages</h1>
+            {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'packages:create' %}" 
+               class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>
+                Add New Package
+            </a>
+            {% else %}
+            <a href="{% url 'users:login' %}?next={% url 'packages:list' %}" 
+               class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>
+                Add New Package
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for package in packages %}
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                {% if package.image %}
+                <img src="{{ package.image.url }}" alt="{{ package.name }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-400">No image available</span>
+                </div>
+                {% endif %}
+                
+                <div class="p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ package.name }}</h2>
+                    <p class="text-gray-600 mb-4">{{ package.destination.name }}</p>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-emerald-600 font-semibold">${{ package.price }}</span>
+                        <span class="text-gray-500">{{ package.duration }} days</span>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4 line-clamp-2">{{ package.description }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <a href="{% url 'packages:detail' package.slug %}" 
+                           class="text-emerald-600 hover:text-emerald-700 font-medium">
+                            View Details
+                        </a>
+                        {% if user.is_staff %}
+                        <div class="flex space-x-2">
+                            <a href="{% url 'packages:update' package.slug %}" 
+                               class="text-gray-600 hover:text-gray-800">
+                                Edit
+                            </a>
+                            <a href="{% url 'packages:delete' package.slug %}" 
+                               class="text-red-600 hover:text-red-800">
+                                Delete
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <div class="text-gray-400 mb-4">
+                    <i class="fas fa-box-open text-6xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No packages found</h3>
+                <p class="text-gray-600">There are no tour packages available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                
+                <span class="px-4 py-2 text-gray-700">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

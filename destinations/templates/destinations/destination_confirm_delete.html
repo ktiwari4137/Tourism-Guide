@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ destination.name }} - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Delete Destination</h1>
+            
+            <div class="prose max-w-none text-gray-600 mb-8">
+                <p>Are you sure you want to delete "{{ destination.name }}"?</p>
+                <p class="text-red-600 font-medium">This action cannot be undone. All associated data (attractions, images, etc.) will also be deleted.</p>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'destinations:detail' destination.slug %}" 
+                   class="px-6 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </a>
+                <form method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

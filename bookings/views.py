@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Booking
-from packages.models import Package
+from packages.models import TourPackage
 from hotels.models import Hotel
 from .forms import BookingForm
 from django.contrib.auth.decorators import login_required
@@ -15,19 +15,21 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     template_name = 'bookings/booking_create.html'
     success_url = reverse_lazy('bookings:history')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        package_id = self.kwargs.get('package_id')
+        if package_id:
+            context['package'] = get_object_or_404(TourPackage, id=package_id)
+        return context
+
     def get_initial(self):
         initial = super().get_initial()
-        package_id = self.request.GET.get('package')
-        hotel_id = self.request.GET.get('hotel')
+        package_id = self.kwargs.get('package_id')
         
         if package_id:
-            package = get_object_or_404(Package, id=package_id)
+            package = get_object_or_404(TourPackage, id=package_id)
             initial['package'] = package
-            initial['hotel'] = package.hotel
             initial['total_price'] = package.price
-        elif hotel_id:
-            hotel = get_object_or_404(Hotel, id=hotel_id)
-            initial['hotel'] = hotel
         
         return initial
 

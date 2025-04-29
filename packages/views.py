@@ -1,13 +1,70 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView
-from django.db.models import Q
-from .models import Package
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .models import TourPackage
+from .forms import TourPackageForm
 from destinations.models import Destination
 
 # Create your views here.
 
+class TourPackageListView(ListView):
+    model = TourPackage
+    template_name = 'packages/list.html'
+    context_object_name = 'packages'
+    paginate_by = 9
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+        return queryset.select_related('destination')
+
+class TourPackageDetailView(DetailView):
+    model = TourPackage
+    template_name = 'packages/detail.html'
+    context_object_name = 'package'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+class TourPackageCreateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
+    model = TourPackage
+    form_class = TourPackageForm
+    template_name = 'packages/form.html'
+    success_url = reverse_lazy('packages:list')
+    success_message = "Tour package was created successfully!"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+class TourPackageUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+    model = TourPackage
+    form_class = TourPackageForm
+    template_name = 'packages/form.html'
+    success_url = reverse_lazy('packages:list')
+    success_message = "Tour package was updated successfully!"
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+class TourPackageDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+    model = TourPackage
+    template_name = 'packages/confirm_delete.html'
+    success_url = reverse_lazy('packages:list')
+    success_message = "Tour package was deleted successfully!"
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
 class PackageListView(ListView):
-    model = Package
+    model = TourPackage
     template_name = 'packages/package_list.html'
     context_object_name = 'packages'
     paginate_by = 9
@@ -39,7 +96,7 @@ class PackageListView(ListView):
         return context
 
 class PackageDetailView(DetailView):
-    model = Package
+    model = TourPackage
     template_name = 'packages/package_detail.html'
     context_object_name = 'package'
 

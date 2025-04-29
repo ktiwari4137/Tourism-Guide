@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Feedback
-from packages.models import Package
+from packages.models import TourPackage
 from hotels.models import Hotel
 from .forms import FeedbackForm
 
@@ -13,21 +13,14 @@ from .forms import FeedbackForm
 class FeedbackCreateView(LoginRequiredMixin, CreateView):
     model = Feedback
     form_class = FeedbackForm
-    template_name = 'feedback/feedback_create.html'
+    template_name = 'feedback/create.html'
     success_url = reverse_lazy('feedback:list')
 
     def get_initial(self):
         initial = super().get_initial()
-        package_id = self.request.GET.get('package')
         hotel_id = self.request.GET.get('hotel')
-        
-        if package_id:
-            package = get_object_or_404(Package, id=package_id)
-            initial['package'] = package
-        elif hotel_id:
-            hotel = get_object_or_404(Hotel, id=hotel_id)
-            initial['hotel'] = hotel
-        
+        if hotel_id:
+            initial['hotel'] = get_object_or_404(Hotel, id=hotel_id)
         return initial
 
     def form_valid(self, form):
@@ -35,20 +28,30 @@ class FeedbackCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'Feedback submitted successfully!')
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['hotels'] = Hotel.objects.all()
+        return context
+
 class FeedbackListView(ListView):
     model = Feedback
-    template_name = 'feedback/feedback_list.html'
+    template_name = 'feedback/list.html'
     context_object_name = 'feedbacks'
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        package_id = self.request.GET.get('package')
+        queryset = Feedback.objects.select_related('user', 'hotel').order_by('-created_at')
+        rating = self.request.GET.get('rating')
         hotel_id = self.request.GET.get('hotel')
-        
-        if package_id:
-            queryset = queryset.filter(package_id=package_id)
-        elif hotel_id:
+
+        if rating:
+            queryset = queryset.filter(rating=rating)
+        if hotel_id:
             queryset = queryset.filter(hotel_id=hotel_id)
-        
-        return queryset.order_by('-created_at')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['hotels'] = Hotel.objects.all()
+        return context

@@ -1,10 +1,13 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from destinations.models import Destination, DestinationImage, Attraction
-from packages.models import Package, TravelStyle
+from packages.models import TourPackage, TravelStyle
 from users.models import Profile, UserPreferences
 from feedback.models import Feedback
 from bookings.models import Booking
+from hotels.models import Hotel
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 import random
 from datetime import datetime, timedelta
 from django.utils.text import slugify
@@ -12,6 +15,8 @@ import os
 from django.core.files import File
 from urllib.request import urlretrieve
 import tempfile
+
+User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Populates the database with sample data'
@@ -137,9 +142,30 @@ class Command(BaseCommand):
                         image=File(open(tmp.name, 'rb'))
                     )
 
+            # Create hotels for each destination
+            hotels = [
+                {'name': f'Luxury Hotel in {destination.name}', 'description': '5-star luxury hotel', 'rating': 5},
+                {'name': f'Budget Hotel in {destination.name}', 'description': '3-star budget hotel', 'rating': 3},
+            ]
+
+            for hotel_data in hotels:
+                Hotel.objects.create(destination=destination, **hotel_data)
+
+            # Create tour packages for each destination
+            for style in style_objects:
+                TourPackage.objects.create(
+                    name=f'{style.name} Tour in {destination.name}',
+                    description=f'{style.name} tour package description',
+                    destination=destination,
+                    price=random.randint(500, 2000),
+                    duration=random.randint(3, 10),
+                    travel_style=style,
+                    is_available=True
+                )
+
             # Create packages for each destination
             for i in range(1, 4):
-                package = Package.objects.create(
+                package = TourPackage.objects.create(
                     name=f'{destination.name} Package {i}',
                     slug=slugify(f'{destination.name}-package-{i}'),
                     destination=destination,

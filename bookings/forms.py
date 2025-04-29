@@ -1,19 +1,21 @@
 from django import forms
 from .models import Booking
-from packages.models import Package
-from hotels.models import Hotel
+from packages.models import TourPackage
 
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['package', 'hotel', 'check_in_date', 'check_out_date', 'number_of_guests', 'special_requests']
+        fields = ['package', 'number_of_guests', 'total_price']
         widgets = {
-            'check_in_date': forms.DateInput(attrs={'type': 'date'}),
-            'check_out_date': forms.DateInput(attrs={'type': 'date'}),
-            'special_requests': forms.Textarea(attrs={'rows': 4}),
+            'package': forms.HiddenInput(),
+            'total_price': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['package'].queryset = Package.objects.filter(is_available=True)
-        self.fields['hotel'].queryset = Hotel.objects.filter(is_available=True) 
+        self.fields['package'].queryset = TourPackage.objects.filter(is_available=True)
+        self.fields['number_of_guests'].widget.attrs.update({
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
+            'min': '1',
+            'max': '10'
+        }) 
