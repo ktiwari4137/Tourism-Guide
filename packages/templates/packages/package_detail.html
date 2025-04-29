@@ -3,95 +3,126 @@
 {% block title %}{{ package.name }} - Tourism Guide{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card mb-4">
-                {% if package.image %}
-                    <img src="{{ package.image.url }}" class="card-img-top" alt="{{ package.name }}" style="height: 400px; object-fit: cover;">
-                {% endif %}
-                <div class="card-body">
-                    <h1 class="card-title display-4">{{ package.name }}</h1>
-                    <p class="text-muted">
-                        <i class="fas fa-map-marker-alt"></i> {{ package.destination.name }}
-                    </p>
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="me-3">
-                            <span class="badge bg-primary">{{ package.get_package_type_display }}</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-calendar text-primary"></i>
-                            <span>{{ package.duration }} days</span>
-                        </div>
+<!-- Hero Section -->
+<section class="relative h-[60vh] bg-cover bg-center" style="background-image: url('{{ package.image.url }}');">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative container mx-auto px-6 h-full flex items-center">
+        <div class="max-w-2xl text-white">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ package.name }}</h1>
+            <div class="flex items-center space-x-4 mb-6">
+                <span class="flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    {{ package.destination.name }}
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-hotel mr-2"></i>
+                    {{ package.hotel.name }}
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-calendar mr-2"></i>
+                    {{ package.duration }} days
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-12">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2">
+                <!-- Description -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">About This Package</h2>
+                    <div class="prose max-w-none">
+                        {{ package.description|linebreaks }}
                     </div>
-                    <p class="card-text lead">{{ package.description }}</p>
-                    
-                    <h5 class="mt-4">Included Services</h5>
-                    <div class="row">
-                        {% for service in package.included_services.splitlines %}
-                        <div class="col-md-6">
-                            <p class="mb-2">
-                                <i class="fas fa-check text-success"></i> {{ service }}
-                            </p>
+                </div>
+
+                <!-- Inclusions -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">What's Included</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for service in package.inclusions.splitlines %}
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-emerald-500 mt-1"></i>
+                            <span>{{ service }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Exclusions -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-semibold mb-4">What's Not Included</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for service in package.exclusions.splitlines %}
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-times text-red-500 mt-1"></i>
+                            <span>{{ service }}</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Package Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <h6>Hotel</h6>
-                        <p class="mb-1">{{ package.hotel.name }}</p>
-                        <p class="text-muted small">
-                            <i class="fas fa-bed"></i> {{ package.hotel.get_room_type_display }}
-                        </p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Price</h6>
-                        <p class="h4">${{ package.price }}</p>
-                        <p class="text-muted small">Per person</p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Duration</h6>
-                        <p>{{ package.duration }} days</p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Package Type</h6>
-                        <p>{{ package.get_package_type_display }}</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Book This Package</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="{% url 'bookings:create' %}">
+            <!-- Right Column -->
+            <div class="lg:col-span-1">
+                <!-- Booking Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <div class="text-center mb-6">
+                        <span class="text-4xl font-bold text-emerald-600">${{ package.price }}</span>
+                        <p class="text-gray-600">per person</p>
+                    </div>
+                    <form method="post" action="{% url 'bookings:create' %}" class="space-y-4">
                         {% csrf_token %}
                         <input type="hidden" name="package" value="{{ package.id }}">
-                        <div class="mb-3">
-                            <label class="form-label">Start Date</label>
-                            <input type="date" name="start_date" class="form-control" required>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Start Date</label>
+                            <input type="date" name="start_date" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Number of People</label>
-                            <input type="number" name="number_of_people" class="form-control" min="1" required>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Number of People</label>
+                            <input type="number" name="number_of_people" min="1" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300">
                             Book Now
                         </button>
                     </form>
                 </div>
+
+                <!-- Package Details -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Package Details</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-medium text-gray-700">Package Type</h3>
+                            <p class="text-gray-600">{{ package.get_package_type_display }}</p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700">Duration</h3>
+                            <p class="text-gray-600">{{ package.duration }} days</p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700">Hotel</h3>
+                            <p class="text-gray-600">{{ package.hotel.name }}</p>
+                            <p class="text-sm text-gray-500">
+                                <i class="fas fa-bed mr-1"></i> {{ package.hotel.get_room_type_display }}
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700">Destination</h3>
+                            <p class="text-gray-600">{{ package.destination.name }}</p>
+                            <p class="text-sm text-gray-500">
+                                <i class="fas fa-map-marker-alt mr-1"></i> {{ package.destination.country }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from .models import User
 from .forms import UserRegistrationForm, UserProfileForm
 
@@ -44,3 +45,33 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+@login_required
+def profile_edit_view(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('users:profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+    
+    return render(request, 'users/profile_edit.html', {
+        'form': form
+    })
+
+@login_required
+def password_change_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your password has been changed successfully!')
+            return redirect('users:profile')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'users/password_change.html', {
+        'form': form
+    })

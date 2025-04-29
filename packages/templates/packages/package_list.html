@@ -3,16 +3,25 @@
 {% block title %}Tour Packages - Tourism Guide{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="mb-4">Tour Packages</h1>
-    
-    <!-- Search and Filter Form -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label for="destination" class="form-label">Destination</label>
-                    <select name="destination" id="destination" class="form-select">
+<!-- Hero Section -->
+<section class="relative h-[50vh] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80');">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative container mx-auto px-6 h-full flex items-center">
+        <div class="max-w-2xl text-white">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Tour Packages</h1>
+            <p class="text-xl">Discover amazing travel experiences</p>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="py-8 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="max-w-4xl mx-auto">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-gray-700 mb-2">Destination</label>
+                    <select name="destination" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         <option value="">All Destinations</option>
                         {% for destination in destinations %}
                             <option value="{{ destination.id }}" {% if request.GET.destination == destination.id|stringformat:"i" %}selected{% endif %}>
@@ -21,9 +30,9 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="package_type" class="form-label">Package Type</label>
-                    <select name="package_type" id="package_type" class="form-select">
+                <div>
+                    <label class="block text-gray-700 mb-2">Package Type</label>
+                    <select name="package_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         <option value="">All Types</option>
                         <option value="B" {% if request.GET.package_type == 'B' %}selected{% endif %}>Basic</option>
                         <option value="S" {% if request.GET.package_type == 'S' %}selected{% endif %}>Standard</option>
@@ -31,99 +40,102 @@
                         <option value="L" {% if request.GET.package_type == 'L' %}selected{% endif %}>Luxury</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label for="min_price" class="form-label">Min Price</label>
-                    <input type="number" name="min_price" id="min_price" class="form-control" value="{{ request.GET.min_price }}">
+                <div>
+                    <label class="block text-gray-700 mb-2">Price Range</label>
+                    <div class="flex space-x-2">
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request.GET.min_price }}" class="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="number" name="max_price" placeholder="Max" value="{{ request.GET.max_price }}" class="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <label for="max_price" class="form-label">Max Price</label>
-                    <input type="number" name="max_price" id="max_price" class="form-control" value="{{ request.GET.max_price }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="duration" class="form-label">Duration (days)</label>
-                    <input type="number" name="duration" id="duration" class="form-control" value="{{ request.GET.duration }}">
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                    <a href="{% url 'packages:list' %}" class="btn btn-secondary">Clear</a>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        Search
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+</section>
 
-    <!-- Packages Grid -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for package in packages %}
-            <div class="col">
-                <div class="card h-100">
-                    {% if package.image %}
-                        <img src="{{ package.image.url }}" class="card-img-top" alt="{{ package.name }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ package.name }}</h5>
-                        <p class="card-text">{{ package.description|truncatewords:20 }}</p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-map-marker-alt"></i> {{ package.destination.name }}
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-hotel"></i> {{ package.hotel.name }}
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <strong>Price: ${{ package.price }}</strong>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                Duration: {{ package.duration }} days
-                            </small>
-                        </p>
+<!-- Packages Grid -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for package in packages %}
+            <div class="bg-white rounded-xl overflow-hidden shadow-lg card-hover transition duration-300">
+                {% if package.image %}
+                    <img src="{{ package.image.url }}" alt="{{ package.name }}" class="w-full h-64 object-cover">
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold">{{ package.name }}</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                            {{ package.get_package_type_display }}
+                        </span>
                     </div>
-                    <div class="card-footer">
-                        <a href="{% url 'packages:detail' package.pk %}" class="btn btn-primary">View Details</a>
+                    <p class="text-gray-600 mb-4">{{ package.description|truncatewords:20 }}</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            {{ package.destination.name }}
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-hotel mr-2"></i>
+                            {{ package.hotel.name }}
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-calendar mr-2"></i>
+                            {{ package.duration }} days
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold text-emerald-600">${{ package.price }}</span>
+                        <a href="{% url 'packages:detail' package.pk %}" class="text-emerald-600 hover:text-emerald-700 font-semibold">
+                            View Details →
+                        </a>
                     </div>
                 </div>
             </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">
-                    No packages found matching your criteria.
-                </div>
+            {% empty %}
+            <div class="col-span-3 text-center py-12">
+                <i class="fas fa-suitcase text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No packages found</h3>
+                <p class="text-gray-600">Try adjusting your search criteria</p>
             </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
 
-    <!-- Pagination -->
-    {% if is_paginated %}
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="mt-12 flex justify-center">
+            <nav class="flex items-center space-x-2">
                 {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.duration %}&duration={{ request.GET.duration }}{% endif %}">First</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.duration %}&duration={{ request.GET.duration }}{% endif %}">Previous</a>
-                    </li>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                       class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50">
+                        Previous
+                    </a>
                 {% endif %}
 
-                <li class="page-item active">
-                    <span class="page-link">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="px-3 py-1 rounded-lg bg-emerald-600 text-white">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                           class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
 
                 {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.duration %}&duration={{ request.GET.duration }}{% endif %}">Next</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.duration %}&duration={{ request.GET.duration }}{% endif %}">Last</a>
-                    </li>
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.package_type %}&package_type={{ request.GET.package_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                       class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50">
+                        Next
+                    </a>
                 {% endif %}
-            </ul>
-        </nav>
-    {% endif %}
-</div>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
