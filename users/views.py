@@ -8,6 +8,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from .models import User
 from .forms import UserRegistrationForm, UserProfileForm
+from bookings.models import Booking
+from feedback.models import Feedback
+from destinations.models import Destination
 
 # Create your views here.
 
@@ -37,10 +40,28 @@ def user_logout(request):
     logout(request)
     return redirect('users:login')
 
-class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+@login_required
+def profile(request):
+    # Get user's recent bookings
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')[:5]
+    
+    # Get user's reviews
+    feedbacks = Feedback.objects.filter(user=request.user).order_by('-created_at')[:5]
+    
+    # Get user's wishlist destinations
+    wishlist_destinations = request.user.wishlist_destinations.all()
+    
+    context = {
+        'bookings': bookings,
+        'feedbacks': feedbacks,
+        'wishlist_destinations': wishlist_destinations,
+    }
+    return render(request, 'users/profile.html', context)
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
-    template_name = 'users/profile.html'
+    template_name = 'users/profile_edit.html'
     success_url = reverse_lazy('users:profile')
 
     def get_object(self):

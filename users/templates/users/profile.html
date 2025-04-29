@@ -101,100 +101,165 @@
                 </div>
             </div>
 
-            <!-- Right Column - Activity -->
+            <!-- Right Column - Tabs -->
             <div class="lg:col-span-2">
-                <!-- Recent Bookings -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold">Recent Bookings</h2>
-                        <a href="{% url 'bookings:history' %}" class="text-emerald-600 hover:text-emerald-700">
-                            View All →
-                        </a>
+                <!-- Tabs Navigation -->
+                <div class="bg-white rounded-xl shadow-lg mb-8">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex -mb-px">
+                            <button class="tab-button active py-4 px-6 text-emerald-600 border-b-2 border-emerald-600 font-medium" data-tab="bookings">
+                                Recent Bookings
+                            </button>
+                            <button class="tab-button py-4 px-6 text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium" data-tab="reviews">
+                                Your Reviews
+                            </button>
+                            <button class="tab-button py-4 px-6 text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium" data-tab="wishlist">
+                                Your Wishlist
+                            </button>
+                        </nav>
                     </div>
-                    <div class="space-y-4">
-                        {% for booking in recent_bookings %}
-                        <div class="border rounded-lg p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-semibold">{{ booking.package.name }}</h3>
-                                    <p class="text-gray-600 text-sm">{{ booking.package.destination.name }}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-sm {% if booking.status == 'confirmed' %}bg-green-100 text-green-800{% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ booking.status|title }}
-                                </span>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Recent Bookings Tab -->
+                    <div class="tab-pane active" id="bookings">
+                        {% if bookings %}
+                            <div class="grid grid-cols-1 gap-6">
+                                {% for booking in bookings %}
+                                    <div class="bg-white rounded-xl shadow-lg p-6">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h3 class="text-xl font-semibold">{{ booking.package.name }}</h3>
+                                                <p class="text-gray-600">{{ booking.booking_date|date:"F d, Y" }}</p>
+                                            </div>
+                                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                                {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                                {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <div class="text-gray-600">
+                                                <p>Guests: {{ booking.number_of_guests }}</p>
+                                                <p>Total: ${{ booking.total_price }}</p>
+                                            </div>
+                                            <a href="{% url 'bookings:detail' booking.id %}" class="text-emerald-600 hover:text-emerald-700">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div class="text-sm text-gray-600">
-                                    <div>Check-in: {{ booking.check_in_date|date:"M d, Y" }}</div>
-                                    <div>Check-out: {{ booking.check_out_date|date:"M d, Y" }}</div>
-                                </div>
-                                <a href="{% url 'bookings:detail' booking.id %}" class="text-emerald-600 hover:text-emerald-700">
-                                    View Details →
+                        {% else %}
+                            <div class="text-center py-12">
+                                <p class="text-gray-600 text-lg">You haven't made any bookings yet.</p>
+                                <a href="{% url 'packages:list' %}" class="mt-4 inline-block bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700">
+                                    Browse Packages
                                 </a>
                             </div>
-                        </div>
-                        {% empty %}
-                        <p class="text-gray-600">No recent bookings</p>
-                        {% endfor %}
+                        {% endif %}
                     </div>
-                </div>
 
-                <!-- Reviews -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold">Your Reviews</h2>
-                        <a href="{% url 'feedback:list' %}" class="text-emerald-600 hover:text-emerald-700">
-                            View All →
-                        </a>
-                    </div>
-                    <div class="space-y-4">
-                        {% for review in recent_reviews %}
-                        <div class="border rounded-lg p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-semibold">{{ review.package.name }}</h3>
-                                <div class="flex text-yellow-400">
-                                    {% for i in "12345"|make_list %}
-                                        {% if forloop.counter <= review.rating %}
-                                            <i class="fas fa-star"></i>
-                                        {% else %}
-                                            <i class="far fa-star"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane hidden" id="reviews">
+                        {% if feedbacks %}
+                            <div class="grid grid-cols-1 gap-6">
+                                {% for feedback in feedbacks %}
+                                    <div class="bg-white rounded-xl shadow-lg p-6">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h3 class="text-xl font-semibold">
+                                                    {% if feedback.package %}
+                                                        {{ feedback.package.name }}
+                                                    {% else %}
+                                                        {{ feedback.hotel.name }}
+                                                    {% endif %}
+                                                </h3>
+                                                <div class="flex items-center mt-2">
+                                                    {% for i in "12345"|make_list %}
+                                                        <i class="fas fa-star {% if forloop.counter <= feedback.rating %}text-yellow-400{% else %}text-gray-300{% endif %}"></i>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <span class="text-gray-500 text-sm">{{ feedback.created_at|date:"F d, Y" }}</span>
+                                        </div>
+                                        <p class="mt-4 text-gray-600">{{ feedback.comment }}</p>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <p class="text-gray-600 mb-2">{{ review.content|truncatewords:30 }}</p>
-                            <div class="text-sm text-gray-500">{{ review.created_at|date:"M d, Y" }}</div>
-                        </div>
-                        {% empty %}
-                        <p class="text-gray-600">No reviews yet</p>
-                        {% endfor %}
+                        {% else %}
+                            <div class="text-center py-12">
+                                <p class="text-gray-600 text-lg">You haven't written any reviews yet.</p>
+                            </div>
+                        {% endif %}
                     </div>
-                </div>
 
-                <!-- Wishlist -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold">Your Wishlist</h2>
-                        <a href="{% url 'destinations:list' %}" class="text-emerald-600 hover:text-emerald-700">
-                            Explore More →
-                        </a>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {% for destination in wishlist %}
-                        <div class="border rounded-lg overflow-hidden">
-                            <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="w-full h-32 object-cover">
-                            <div class="p-4">
-                                <h3 class="font-semibold">{{ destination.name }}</h3>
-                                <p class="text-gray-600 text-sm">{{ destination.country }}</p>
+                    <!-- Wishlist Tab -->
+                    <div class="tab-pane hidden" id="wishlist">
+                        {% if wishlist_destinations %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {% for destination in wishlist_destinations %}
+                                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                                        <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="w-full h-48 object-cover">
+                                        <div class="p-6">
+                                            <h3 class="text-xl font-semibold">{{ destination.name }}</h3>
+                                            <p class="text-gray-600 mt-2">{{ destination.country }}</p>
+                                            <div class="mt-4 flex justify-between items-center">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-star text-yellow-400"></i>
+                                                    <span class="ml-1 text-gray-600">{{ destination.rating }}</span>
+                                                </div>
+                                                <form method="post" action="{% url 'destinations:remove_from_wishlist' destination.slug %}" class="inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="text-red-600 hover:text-red-700">
+                                                        <i class="fas fa-heart"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <a href="{{ destination.get_absolute_url }}" class="mt-4 inline-block text-emerald-600 hover:text-emerald-700">
+                                                View Destination
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                        </div>
-                        {% empty %}
-                        <p class="text-gray-600">No destinations in wishlist</p>
-                        {% endfor %}
+                        {% else %}
+                            <div class="text-center py-12">
+                                <p class="text-gray-600 text-lg">Your wishlist is empty.</p>
+                                <a href="{% url 'destinations:list' %}" class="mt-4 inline-block bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700">
+                                    Browse Destinations
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and panes
+            tabButtons.forEach(btn => btn.classList.remove('active', 'border-emerald-600', 'text-emerald-600'));
+            tabButtons.forEach(btn => btn.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'));
+            tabPanes.forEach(pane => pane.classList.add('hidden'));
+
+            // Add active class to clicked button and corresponding pane
+            button.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            button.classList.add('active', 'border-emerald-600', 'text-emerald-600');
+            document.getElementById(button.dataset.tab).classList.remove('hidden');
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

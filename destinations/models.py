@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 from django.urls import reverse
+from django.conf import settings
 
 class Destination(models.Model):
     CLIMATE_CHOICES = [
@@ -28,6 +29,7 @@ class Destination(models.Model):
     time_zone = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    wishlist_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='wishlist_destinations', blank=True)
 
     def __str__(self):
         return f"{self.name}, {self.country}"

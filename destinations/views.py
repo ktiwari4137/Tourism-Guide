@@ -1,9 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Destination, Attraction, DestinationImage
 from .forms import DestinationForm, AttractionForm, DestinationImageForm
 from packages.models import TourPackage
@@ -147,3 +149,29 @@ class DestinationImageCreateView(LoginRequiredMixin, UserPassesTestMixin, Succes
 
     def test_func(self):
         return self.request.user.is_staff
+
+def destination_list(request):
+    destinations = Destination.objects.all()
+    return render(request, 'destinations/list.html', {'destinations': destinations})
+
+def destination_detail(request, slug):
+    destination = get_object_or_404(Destination, slug=slug)
+    return render(request, 'destinations/detail.html', {'destination': destination})
+
+@login_required
+def add_to_wishlist(request, slug):
+    destination = get_object_or_404(Destination, slug=slug)
+    if destination not in request.user.wishlist_destinations.all():
+        request.user.wishlist_destinations.add(destination)
+        messages.success(request, f'{destination.name} added to your wishlist!')
+    else:
+        messages.info(request, f'{destination.name} is already in your wishlist!')
+    return redirect('destinations:detail', slug=slug)
+
+@login_required
+def remove_from_wishlist(request, slug):
+    destination = get_object_or_404(Destination, slug=slug)
+    if destination in request.user.wishlist_destinations.all():
+        request.user.wishlist_destinations.remove(destination)
+        messages.success(request, f'{destination.name} removed from your wishlist!')
+    return redirect('users:profile')
