@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Weather Information - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Weather Information</h2>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-4">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.location }}
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    {% if forecasts %}
+                        <div class="list-group">
+                            {% for forecast in forecasts %}
+                                <a href="{% url 'weather:forecast_detail' forecast.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ forecast.location }}</h5>
+                                        <small>{{ forecast.forecast_date|date:"F d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        <i class="fas fa-temperature-high"></i> {{ forecast.temperature }}°C
+                                        <i class="fas fa-tint ml-3"></i> {{ forecast.humidity }}%
+                                        <i class="fas fa-wind ml-3"></i> {{ forecast.wind_speed }} km/h
+                                    </p>
+                                    <small>
+                                        <i class="fas fa-{{ forecast.get_weather_icon }}"></i> {{ forecast.get_condition_display }}
+                                    </small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-cloud-sun fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No weather forecasts found. Try searching for a location.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

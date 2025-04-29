@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 400px; object-fit: cover;">
+                <div class="card-body">
+                    <h1 class="card-title display-4">{{ hotel.name }}</h1>
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ hotel.destination.name }}
+                    </p>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <span class="h5">{{ hotel.rating }}</span>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary">{{ hotel.get_room_type_display }}</span>
+                            <span class="ms-2 h5">${{ hotel.price_per_night }}/night</span>
+                        </div>
+                    </div>
+                    <p class="card-text lead">{{ hotel.description }}</p>
+                    
+                    <h5 class="mt-4">Amenities</h5>
+                    <div class="row">
+                        {% for amenity in hotel.amenities.splitlines %}
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <i class="fas fa-check text-success"></i> {{ amenity }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Book Your Stay</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'bookings:create' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="hotel" value="{{ hotel.id }}">
+                        <div class="mb-3">
+                            <label class="form-label">Check-in Date</label>
+                            <input type="date" name="check_in_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Check-out Date</label>
+                            <input type="date" name="check_out_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Number of Guests</label>
+                            <input type="number" name="number_of_guests" class="form-control" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Book Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Available Packages</h5>
+                </div>
+                <div class="card-body">
+                    {% for package in packages %}
+                    <div class="mb-3">
+                        <h6>{{ package.name }}</h6>
+                        <p class="text-muted small mb-1">
+                            <i class="fas fa-calendar"></i> {{ package.duration }} days
+                            <span class="float-end">${{ package.price }}</span>
+                        </p>
+                        <a href="{% url 'packages:detail' package.id %}" class="btn btn-sm btn-outline-primary">
+                            View Package
+                        </a>
+                    </div>
+                    {% if not forloop.last %}<hr>{% endif %}
+                    {% empty %}
+                    <p class="text-muted">No packages available for this hotel.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

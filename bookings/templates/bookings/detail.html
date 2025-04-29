@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking #{{ booking.id }} - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Booking Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Booking ID</h6>
+                            <p class="h5">#{{ booking.id }}</p>
+                            
+                            <h6 class="text-muted mt-3">Status</h6>
+                            <p>
+                                <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </p>
+                            
+                            <h6 class="text-muted mt-3">Booking Date</h6>
+                            <p>{{ booking.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Check-in Date</h6>
+                            <p class="h5">{{ booking.check_in_date|date:"F d, Y" }}</p>
+                            
+                            <h6 class="text-muted mt-3">Check-out Date</h6>
+                            <p class="h5">{{ booking.check_out_date|date:"F d, Y" }}</p>
+                            
+                            <h6 class="text-muted mt-3">Number of Guests</h6>
+                            <p class="h5">{{ booking.number_of_guests }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Hotel Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{{ booking.hotel.image.url }}" alt="{{ booking.hotel.name }}" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-8">
+                            <h4>{{ booking.hotel.name }}</h4>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> {{ booking.hotel.destination.name }}
+                            </p>
+                            <p>{{ booking.hotel.description }}</p>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span>{{ booking.hotel.rating }}</span>
+                                </div>
+                                <div>
+                                    <span class="badge bg-primary">{{ booking.hotel.get_room_type_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Room Price</span>
+                        <span>${{ booking.hotel.price_per_night }}/night</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Number of Nights</span>
+                        <span>{{ booking.nights }} nights</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="h5">Total Amount</span>
+                        <span class="h5">${{ booking.total_price }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if booking.status == 'pending' %}
+                        <a href="{% url 'bookings:cancel' booking.id %}" class="btn btn-danger w-100 mb-2">
+                            <i class="fas fa-times me-2"></i> Cancel Booking
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'hotels:detail' booking.hotel.id %}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-hotel me-2"></i> View Hotel
+                    </a>
+                    
+                    <a href="{% url 'bookings:history' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i> Back to History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

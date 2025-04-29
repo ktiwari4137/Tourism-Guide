@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Feedback - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Submit Your Feedback</h2>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                Please correct the errors below.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Select Hotel</label>
+                            <select name="hotel" class="form-select" required>
+                                <option value="">Choose a hotel...</option>
+                                {% for hotel in hotels %}
+                                <option value="{{ hotel.id }}" {% if form.hotel.value == hotel.id %}selected{% endif %}>
+                                    {{ hotel.name }} - {{ hotel.destination.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Rating</label>
+                            <div class="rating">
+                                {% for i in "54321"|make_list %}
+                                <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" {% if form.rating.value == i %}checked{% endif %}>
+                                <label for="star{{ i }}" class="fas fa-star"></label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_comment" class="form-label">Your Feedback</label>
+                            <textarea name="comment" id="id_comment" class="form-control" rows="5" required>{{ form.comment.value|default:"" }}</textarea>
+                            <div class="form-text">Share your experience with us. What did you like or dislike about your stay?</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                            </button>
+                            <a href="{% url 'feedback:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Feedback List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    
+    .rating input {
+        display: none;
+    }
+    
+    .rating label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .rating input:checked ~ label,
+    .rating label:hover,
+    .rating label:hover ~ label {
+        color: #ffc107;
+    }
+</style>
+{% endblock %} 

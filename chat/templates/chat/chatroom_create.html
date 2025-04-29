@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Chat Room - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Create New Chat Room</h2>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                Please correct the errors below.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Chat Room Name</label>
+                            <input type="text" name="name" id="id_name" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_participants" class="form-label">Select Participants</label>
+                            <select name="participants" id="id_participants" class="form-select" multiple required>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold Ctrl (Windows) or Command (Mac) to select multiple users.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i> Create Chat Room
+                            </button>
+                            <a href="{% url 'chat:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

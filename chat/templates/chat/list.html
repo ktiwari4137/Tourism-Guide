@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Chats - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Start New Chat</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'chat:create' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Select User</label>
+                            <select name="participant" class="form-select" required>
+                                <option value="">Choose a user...</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">
+                                    {{ user.get_full_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-comments me-2"></i> Start Chat
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Your Chats</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if chats %}
+                        <div class="list-group list-group-flush">
+                            {% for chat in chats %}
+                            <a href="{% url 'chat:detail' chat.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ chat.other_participant.profile.image.url }}" alt="{{ chat.other_participant.get_full_name }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">{{ chat.other_participant.get_full_name }}</h6>
+                                            <small class="text-muted">{{ chat.last_message.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                        <p class="mb-0 text-muted small">
+                                            {% if chat.last_message.sender == user %}
+                                                You: {{ chat.last_message.content|truncatechars:50 }}
+                                            {% else %}
+                                                {{ chat.last_message.content|truncatechars:50 }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                            <h4>No chats yet</h4>
+                            <p class="text-muted">Start a new chat with another user.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

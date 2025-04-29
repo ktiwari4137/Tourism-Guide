@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ package.name }} - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                {% if package.image %}
+                    <img src="{{ package.image.url }}" class="card-img-top" alt="{{ package.name }}" style="height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title display-4">{{ package.name }}</h1>
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ package.destination.name }}
+                    </p>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <span class="badge bg-primary">{{ package.get_package_type_display }}</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar text-primary"></i>
+                            <span>{{ package.duration }} days</span>
+                        </div>
+                    </div>
+                    <p class="card-text lead">{{ package.description }}</p>
+                    
+                    <h5 class="mt-4">Included Services</h5>
+                    <div class="row">
+                        {% for service in package.included_services.splitlines %}
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <i class="fas fa-check text-success"></i> {{ service }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Package Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Hotel</h6>
+                        <p class="mb-1">{{ package.hotel.name }}</p>
+                        <p class="text-muted small">
+                            <i class="fas fa-bed"></i> {{ package.hotel.get_room_type_display }}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Price</h6>
+                        <p class="h4">${{ package.price }}</p>
+                        <p class="text-muted small">Per person</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Duration</h6>
+                        <p>{{ package.duration }} days</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Package Type</h6>
+                        <p>{{ package.get_package_type_display }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Book This Package</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'bookings:create' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="package" value="{{ package.id }}">
+                        <div class="mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Number of People</label>
+                            <input type="number" name="number_of_people" class="form-control" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Book Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

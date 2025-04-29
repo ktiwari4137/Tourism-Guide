@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tourism Guide - Your Adventure Starts Here{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .page-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            min-height: 60vh;
+        }
+        .page-section.active {
+            display: block;
+            opacity: 1;
+        }
+        .nav-link.active {
+            font-weight: 700;
+            color: #059669;
+            border-bottom: 2px solid #10b981;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .search-tab {
+            cursor: pointer;
+            padding: 8px 16px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s, color 0.3s;
+        }
+        .search-tab.active {
+            border-bottom-color: #10b981;
+            color: #059669;
+            font-weight: 600;
+        }
+        .search-content {
+            display: none;
+        }
+        .search-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-emerald-600">Tourism Guide</a>
+            <div class="hidden md:flex space-x-6">
+                <a href="{% url 'home' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'destinations:list' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if 'destinations' in request.resolver_match.namespace %}active{% endif %}">Destinations</a>
+                <a href="{% url 'packages:list' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if 'packages' in request.resolver_match.namespace %}active{% endif %}">Tours</a>
+                <a href="{% url 'about' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a>
+                <a href="{% url 'contact' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:profile' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if 'users' in request.resolver_match.namespace %}active{% endif %}">Profile</a>
+                    <a href="{% url 'users:logout' %}" class="nav-link text-gray-600 hover:text-emerald-600">Logout</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if request.resolver_match.url_name == 'login' %}active{% endif %}">Login</a>
+                    <a href="{% url 'users:register' %}" class="nav-link text-gray-600 hover:text-emerald-600 {% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a>
+                {% endif %}
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-2 border-t border-gray-200">
+            <a href="{% url 'home' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Home</a>
+            <a href="{% url 'destinations:list' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Destinations</a>
+            <a href="{% url 'packages:list' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Tours</a>
+            <a href="{% url 'about' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">About Us</a>
+            <a href="{% url 'contact' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Contact</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Profile</a>
+                <a href="{% url 'users:logout' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Logout</a>
+            {% else %}
+                <a href="{% url 'users:login' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Login</a>
+                <a href="{% url 'users:register' %}" class="block px-6 py-2 text-gray-600 hover:bg-emerald-50">Register</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-emerald-800 text-emerald-100 mt-16 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; <span id="current-year"></span> Tourism Guide. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-white">Facebook</a>
+                <a href="#" class="hover:text-white">Instagram</a>
+                <a href="#" class="hover:text-white">Twitter</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Footer Year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Search Tab Logic
+        const searchTabs = document.querySelectorAll('.search-tab');
+        const searchContents = document.querySelectorAll('.search-content');
+
+        searchTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.target;
+                searchTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                searchContents.forEach(content => {
+                    content.classList.toggle('active', content.id === targetId);
+                });
+            });
+        });
+
+        // Date Input Validation
+        const today = new Date().toISOString().split('T')[0];
+        const checkinInput = document.getElementById('hotel-checkin');
+        const checkoutInput = document.getElementById('hotel-checkout');
+
+        if (checkinInput && checkoutInput) {
+            checkinInput.setAttribute('min', today);
+            checkoutInput.setAttribute('min', today);
+
+            checkinInput.addEventListener('change', () => {
+                if (checkinInput.value) {
+                    checkoutInput.setAttribute('min', checkinInput.value);
+                    if (checkoutInput.value && checkoutInput.value < checkinInput.value) {
+                        checkoutInput.value = '';
+                    }
+                } else {
+                    checkoutInput.setAttribute('min', today);
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

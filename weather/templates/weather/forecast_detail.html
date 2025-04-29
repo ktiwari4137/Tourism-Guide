@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Weather Forecast for {{ forecast.location }} - Tourism Guide{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Weather Forecast for {{ forecast.location }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="weather-icon text-center mb-4">
+                                <i class="fas fa-{{ forecast.get_weather_icon }} fa-5x text-primary"></i>
+                            </div>
+                            <h3 class="text-center">{{ forecast.get_condition_display }}</h3>
+                            <h1 class="text-center display-4">{{ forecast.temperature }}°C</h1>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="weather-details">
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-tint"></i>
+                                    <span>Humidity: {{ forecast.humidity }}%</span>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-wind"></i>
+                                    <span>Wind Speed: {{ forecast.wind_speed }} km/h</span>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-compass"></i>
+                                    <span>Wind Direction: {{ forecast.get_wind_direction_display }}</span>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Pressure: {{ forecast.pressure }} hPa</span>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-sun"></i>
+                                    <span>UV Index: {{ forecast.uv_index }}</span>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <i class="fas fa-cloud-rain"></i>
+                                    <span>Precipitation: {{ forecast.precipitation }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h4>Forecast Date: {{ forecast.forecast_date|date:"F d, Y" }}</h4>
+                        {% if forecast.destination %}
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> 
+                                <a href="{% url 'destinations:detail' forecast.destination.id %}">
+                                    {{ forecast.destination.name }}
+                                </a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'weather:info' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Weather Search
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .weather-icon {
+        color: #007bff;
+    }
+    .detail-item {
+        display: flex;
+        align-items: center;
+    }
+    .detail-item i {
+        width: 30px;
+        color: #6c757d;
+    }
+</style>
+{% endblock %} 
