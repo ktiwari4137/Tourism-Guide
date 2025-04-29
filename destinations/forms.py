@@ -5,14 +5,16 @@ class DestinationForm(forms.ModelForm):
     class Meta:
         model = Destination
         fields = [
-            'name', 'country', 'climate', 'description', 'rating',
+            'name', 'slug', 'country', 'climate', 'description', 'rating',
             'best_time_to_visit', 'popular_activities', 'local_cuisine',
-            'language', 'currency', 'time_zone', 'image'
+            'language', 'currency', 'time_zone', 'image', 'latitude', 'longitude'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'popular_activities': forms.Textarea(attrs={'rows': 3}),
             'local_cuisine': forms.Textarea(attrs={'rows': 3}),
+            'latitude': forms.NumberInput(attrs={'step': '0.000001'}),
+            'longitude': forms.NumberInput(attrs={'step': '0.000001'}),
         }
 
     def __init__(self, *args, **kwargs):

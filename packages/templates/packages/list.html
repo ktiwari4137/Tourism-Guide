@@ -8,14 +8,8 @@
     <div class="max-w-7xl mx-auto">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Tour Packages</h1>
-            {% if user.is_authenticated and user.is_staff %}
+            {% if user.is_staff %}
             <a href="{% url 'packages:create' %}" 
-               class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
-                <i class="fas fa-plus mr-2"></i>
-                Add New Package
-            </a>
-            {% else %}
-            <a href="{% url 'users:login' %}?next={% url 'packages:list' %}" 
                class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
                 <i class="fas fa-plus mr-2"></i>
                 Add New Package

@@ -6,6 +6,7 @@ from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.conf import settings
 from .models import User
 from .forms import UserRegistrationForm, UserProfileForm
 from bookings.models import Booking
@@ -17,11 +18,18 @@ from destinations.models import Destination
 class UserRegistrationView(CreateView):
     form_class = UserRegistrationForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('destinations:list')
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        login(self.request, self.object)
+        # Use the ModelBackend for authentication
+        user = authenticate(
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password1'],
+            backend='django.contrib.auth.backends.ModelBackend'
+        )
+        if user is not None:
+            login(self.request, user)
         return response
 
 def user_login(request):

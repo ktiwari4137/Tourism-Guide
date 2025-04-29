@@ -9,6 +9,8 @@ from django.contrib import messages
 from .models import Destination, Attraction, DestinationImage
 from .forms import DestinationForm, AttractionForm, DestinationImageForm
 from packages.models import TourPackage
+from django.http import JsonResponse
+from django.conf import settings
 
 # Create your views here.
 
@@ -55,6 +57,7 @@ class DestinationDetailView(DetailView):
         context['images'] = self.object.images.all()
         context['attractions'] = self.object.attractions.all()
         context['tour_packages'] = TourPackage.objects.filter(destination=self.object)
+        context['weather_api_key'] = getattr(settings, 'OPENWEATHERMAP_API_KEY', '')
         return context
 
 class DestinationCreateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
@@ -175,3 +178,87 @@ def remove_from_wishlist(request, slug):
         request.user.wishlist_destinations.remove(destination)
         messages.success(request, f'{destination.name} removed from your wishlist!')
     return redirect('users:profile')
+
+class ManageDestinationContentView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Destination
+    template_name = 'destinations/manage_content.html'
+    context_object_name = 'destination'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def post(self, request, *args, **kwargs):
+        destination = self.get_object()
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'image':
+            # Handle image upload
+            image = request.FILES.get('image')
+            caption = request.POST.get('caption', '')
+            is_featured = request.POST.get('is_featured') == 'on'
+
+            if image:
+                DestinationImage.objects.create(
+                    destination=destination,
+                    image=image,
+                    caption=caption,
+                    is_featured=is_featured
+                )
+                messages.success(request, 'Image added successfully!')
+            else:
+                messages.error(request, 'Please select an image to upload.')
+
+        elif form_type == 'attraction':
+            # Handle attraction creation
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            type = request.POST.get('type')
+            image = request.FILES.get('image')
+            address = request.POST.get('address')
+            opening_hours = request.POST.get('opening_hours')
+            ticket_price = request.POST.get('ticket_price')
+
+            if name and description and type and image:
+                Attraction.objects.create(
+                    destination=destination,
+                    name=name,
+                    description=description,
+                    type=type,
+                    image=image,
+                    address=address,
+                    opening_hours=opening_hours,
+                    ticket_price=ticket_price
+                )
+                messages.success(request, 'Attraction added successfully!')
+            else:
+                messages.error(request, 'Please fill in all required fields.')
+
+        return redirect('destinations:manage_content', slug=destination.slug)
+
+class DeleteDestinationImageView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = DestinationImage
+    success_url = reverse_lazy('destinations:list')
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        destination_slug = self.object.destination.slug
+        self.object.delete()
+        messages.success(request, 'Image deleted successfully!')
+        return redirect('destinations:manage_content', slug=destination_slug)
+
+class DeleteAttractionView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Attraction
+    success_url = reverse_lazy('destinations:list')
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        destination_slug = self.object.destination.slug
+        self.object.delete()
+        messages.success(request, 'Attraction deleted successfully!')
+        return redirect('destinations:manage_content', slug=destination_slug)

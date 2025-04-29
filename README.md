@@ -1,17 +1,17 @@
 # Tourism Guide
 
-A comprehensive tourism management system built with Django.
+A comprehensive tourism management system that allows users to explore destinations, book tours, and manage their travel experiences.
 
 ## Features
 
 - User authentication and profile management
-- Destination and hotel listings
-- Package bookings
-- Weather forecasts
-- User feedback system
-- Real-time chat
-- Booking management
-- Responsive design with Bootstrap 5
+- Destination exploration with maps and weather information
+- Tour package booking system
+- Wishlist functionality
+- Admin dashboard for content management
+- Real-time weather updates
+- Interactive maps
+- Photo galleries and attraction management
 
 ## Prerequisites
 
@@ -29,10 +29,12 @@ cd tourism-guide
 
 2. Create and activate a virtual environment:
 ```bash
+# Windows
 python -m venv venv
-# On Windows
 venv\Scripts\activate
-# On macOS/Linux
+
+# Linux/Mac
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -41,12 +43,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Apply migrations:
+4. Set up the database:
 ```bash
 python manage.py migrate
 ```
 
-5. Create a superuser:
+5. Create a superuser (admin account):
 ```bash
 python manage.py createsuperuser
 ```
@@ -56,22 +58,122 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-7. Access the application at http://127.0.0.1:8000/
+## Configuration
 
-## Project Structure
+1. Create a `.env` file in the project root with the following variables:
+```
+DEBUG=True
+SECRET_KEY=your-secret-key-here
+```
 
-- `tourism_guide/` - Main project configuration
-- `users/` - User authentication and profile management
-- `destinations/` - Destination listings and details
-- `hotels/` - Hotel listings and details
-- `packages/` - Tour package management
-- `bookings/` - Booking system
-- `feedback/` - User feedback system
-- `chat/` - Real-time chat functionality
-- `weather/` - Weather forecast integration
+2. Configure media and static files:
+```bash
+python manage.py collectstatic
+```
+
+## Admin Guide
+
+### Accessing the Admin Panel
+1. Visit `http://localhost:8000/admin/`
+2. Log in with your superuser credentials
+
+### Managing Destinations
+1. Click on "Destinations" in the admin panel
+2. Add a new destination with:
+   - Name and description
+   - Country and climate
+   - Latitude and longitude (for maps and weather)
+   - Upload destination image
+   - Add additional information (best time to visit, activities, etc.)
+
+### Managing Tour Packages
+1. Click on "Tour Packages" in the admin panel
+2. Create new packages with:
+   - Package name and description
+   - Select destination
+   - Set price and duration
+   - Add package image
+   - Configure availability and capacity
+
+### Managing Content
+1. Add destination images:
+   - Go to destination detail
+   - Click "Manage Content"
+   - Upload images with captions
+   - Mark featured images
+
+2. Add attractions:
+   - Go to destination detail
+   - Click "Manage Content"
+   - Add attraction details
+   - Upload attraction images
+   - Set opening hours and ticket prices
+
+## User Guide
+
+### Registration and Login
+1. Visit the registration page
+2. Fill in your details:
+   - Email address
+   - Password
+   - Personal information
+3. Verify your email (if enabled)
+4. Log in with your credentials
+
+### Exploring Destinations
+1. Browse destinations on the home page
+2. Use filters to find specific destinations
+3. View destination details:
+   - See location on map
+   - Check current weather
+   - View photo gallery
+   - Explore attractions
+
+### Managing Wishlist
+1. Log in to your account
+2. Visit any destination
+3. Click "Add to Wishlist" to save
+4. View your wishlist in your profile
+
+### Booking Tours
+1. Select a destination
+2. Browse available tour packages
+3. Click "View Details" on a package
+4. Select dates and number of people
+5. Complete the booking process
+6. View your bookings in your profile
+
+### Profile Management
+1. Access your profile from the navigation menu
+2. Update personal information
+3. View booking history
+4. Manage wishlist
+5. Update profile picture
+
+## Development
+
+### Project Structure
+```
+tourism_guide/
+├── destinations/         # Destination management
+├── packages/            # Tour package management
+├── bookings/           # Booking system
+├── users/              # User authentication and profiles
+├── static/             # Static files
+└── templates/          # HTML templates
+```
+
+### Adding New Features
+1. Create a new app for the feature:
+```bash
+python manage.py startapp new_feature
+```
+
+2. Add the app to `INSTALLED_APPS` in settings.py
+3. Create models, views, and templates
+4. Add URLs and forms as needed
 
 ## Contributing
-
 1. Fork the repository
 2. Create a feature branch
 3. Commit your changes
@@ -79,5 +181,13 @@ python manage.py runserver
 5. Create a Pull Request
 
 ## License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+## Support
+For support, please open an issue in the repository or contact the development team.
+
+## Acknowledgments
+- OpenStreetMap for map data
+- Open-Meteo for weather data
+- Font Awesome for icons
+- Django framework 

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage {{ destination.name }} Content{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-8">Manage Content for {{ destination.name }}</h1>
+        
+        <!-- Photo Gallery Management -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6">Photo Gallery</h2>
+            
+            <!-- Add New Image Form -->
+            <form method="post" enctype="multipart/form-data" class="mb-8">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="image">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                            Image
+                        </label>
+                        <input type="file" name="image" id="image" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="caption">
+                            Caption
+                        </label>
+                        <input type="text" name="caption" id="caption" maxlength="200"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="is_featured" class="form-checkbox h-5 w-5 text-emerald-600">
+                        <span class="ml-2 text-gray-700">Featured Image</span>
+                    </label>
+                </div>
+                <button type="submit" class="mt-4 bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+                    Add Image
+                </button>
+            </form>
+
+            <!-- Image Gallery -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {% for image in destination.images.all %}
+                <div class="group relative aspect-w-16 aspect-h-9 rounded-xl overflow-hidden">
+                    <img src="{{ image.image.url }}" alt="{{ image.caption }}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <form method="post" action="{% url 'destinations:delete_image' image.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-white hover:text-red-500">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% if image.is_featured %}
+                    <div class="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded-lg text-xs">
+                        Featured
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Attractions Management -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6">Top Attractions</h2>
+            
+            <!-- Add New Attraction Form -->
+            <form method="post" enctype="multipart/form-data" class="mb-8">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="attraction">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+                            Name
+                        </label>
+                        <input type="text" name="name" id="name" required maxlength="200"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="type">
+                            Type
+                        </label>
+                        <select name="type" id="type" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="natural">Natural</option>
+                            <option value="cultural">Cultural</option>
+                            <option value="historical">Historical</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="shopping">Shopping</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                            Description
+                        </label>
+                        <textarea name="description" id="description" rows="3" required
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                            Image
+                        </label>
+                        <input type="file" name="image" id="image" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
+                            Address
+                        </label>
+                        <input type="text" name="address" id="address" maxlength="200"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="opening_hours">
+                            Opening Hours
+                        </label>
+                        <input type="text" name="opening_hours" id="opening_hours" maxlength="200"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="ticket_price">
+                            Ticket Price
+                        </label>
+                        <input type="number" name="ticket_price" id="ticket_price" step="0.01"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+                <button type="submit" class="mt-4 bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+                    Add Attraction
+                </button>
+            </form>
+
+            <!-- Attractions List -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for attraction in destination.attractions.all %}
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold">{{ attraction.name }}</h3>
+                        <form method="post" action="{% url 'destinations:delete_attraction' attraction.slug %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden mb-4">
+                        <img src="{{ attraction.image.url }}" alt="{{ attraction.name }}" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-gray-600 mb-2">{{ attraction.description }}</p>
+                    <div class="text-sm text-gray-500">
+                        <p><strong>Type:</strong> {{ attraction.get_type_display }}</p>
+                        {% if attraction.address %}
+                        <p><strong>Address:</strong> {{ attraction.address }}</p>
+                        {% endif %}
+                        {% if attraction.opening_hours %}
+                        <p><strong>Hours:</strong> {{ attraction.opening_hours }}</p>
+                        {% endif %}
+                        {% if attraction.ticket_price %}
+                        <p><strong>Price:</strong> ${{ attraction.ticket_price }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
